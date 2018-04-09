@@ -19,6 +19,7 @@ $(function() {
         it('are defined', ()=> {
             expect(allFeeds).toBeDefined();
             expect(allFeeds.length).not.toBe(0);
+
         });
 
 
@@ -26,21 +27,26 @@ $(function() {
          * 编写一个测试遍历 allFeeds 对象里面的所有的源来保证有链接字段而且链接不是空的。
          */
         it('对象里面的所有的源来保证有链接字段而且链接不是空的',()=>{
-            allFeeds.forEach(feed => {
-                expect(feed.url).toBeDefined();
-                expect(feed.url.length).not.toEqual(0);
-            });
+            sameDetection('url');
         });
 
         /* TODO:
          * 编写一个测试遍历 allFeeds 对象里面的所有的源来保证有名字字段而且不是空的。
          */
         it('对象里面的所有的源来保证有名字字段而且不是空的',()=>{
+                sameDetection('name');
+        });
+        const sameDetection= (name) => {
+            // 将相似的代码都移入到该方法中，避免重复编写相同代码。
             allFeeds.forEach(feed => {
                 expect(feed.name).toBeDefined();
                 expect(feed.name.length).not.toEqual(0);
+                if(name==='url'){
+                    var regularExpressionUrl = /^((ht|f)tps?):\/\/([\w\-]+(\.[\w\-]+)*\/)*[\w\-]+(\.[\w\-]+)*\/?(\?([\w\-\.,@?^=%&:\/~\+#]*)+)?/; // 检查 URL 格式是否正确的正规表达式
+                    expect(feed.url).toMatch(regularExpressionUrl); // 检查格式
+                };
             });
-        });
+         };
     });
 
 
@@ -77,13 +83,10 @@ $(function() {
          * 和异步的 done() 函数。
          */
         beforeEach((done)=> {
-            loadFeed(0,()=>{
-                done();
-            });
+            loadFeed(0,done);
         });
-        it('loadFeed 函数被调用而且工作正常',(done)=>{
+        it('loadFeed 函数被调用而且工作正常',()=>{
             expect($(".feed .entry").length).not.toEqual(0);
-            done();
         });
     });
 
@@ -97,14 +100,14 @@ $(function() {
         beforeEach((done)=> {
             loadFeed(0,()=>{
                 feed1 = $('.feed').html();
-                done();
+                loadFeed(1,()=>{
+                    done();
+                });
             });
         });
         it('保证当用 loadFeed 函数加载一个新源的时候内容会真的改变',(done)=>{
-            loadFeed(1,()=>{
-                feed2 = $('.feed').html();
-                expect(feed1).not.toEqual(feed2);
-            });
+            feed2 = $('.feed').html();
+            expect(feed1).not.toEqual(feed2);
             done();
         });
     });
